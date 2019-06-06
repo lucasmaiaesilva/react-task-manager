@@ -8,6 +8,15 @@ class App extends Component {
     tasks: []
   }
 
+  componentWillMount() {
+    const toDoListItems = window.localStorage.getItem('toDoListItems') || '[]';
+    this.setState({ tasks: JSON.parse(toDoListItems) });
+  }
+
+  updateLocalStorage(items) {
+    window.localStorage.setItem('toDoListItems', JSON.stringify(items));
+  }
+
   addTask = (e) => {
     e.preventDefault();
     let { tasks } = this.state;
@@ -18,6 +27,7 @@ class App extends Component {
       status: 'To Do'
     }
     tasks = tasks.concat(newTask);
+    this.updateLocalStorage(tasks);
     this.setState({ tasks });
   }
 
@@ -27,7 +37,8 @@ class App extends Component {
       ...task,
       status: target.checked ? 'Done': 'To Do'
     })
-    this.setState({ tasks  });
+    this.updateLocalStorage(tasks);
+    this.setState({ tasks });
   }
   
   render() {

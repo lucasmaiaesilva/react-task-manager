@@ -1,44 +1,36 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { addTodo, updateTask } from './actions';
 import logo from './logo.svg';
 import Column from './Column';
 import './App.css';
 
 class App extends Component {
-  state = {
-    tasks: []
-  }
-
   componentWillMount() {
-    const toDoListItems = window.localStorage.getItem('toDoListItems') || '[]';
-    this.setState({ tasks: JSON.parse(toDoListItems) });
+    // const toDoListItems = window.localStorage.getItem('toDoListItems') || '[]';
+    // this.setState({ tasks: JSON.parse(toDoListItems) });
   }
 
   updateLocalStorage(items) {
-    window.localStorage.setItem('toDoListItems', JSON.stringify(items));
+    // window.localStorage.setItem('toDoListItems', JSON.stringify(items));
   }
 
   addTask = (e) => {
     e.preventDefault();
-    let { tasks } = this.state;
     const value = e.target.querySelector('input').value;
     const newTask = {
-      id: tasks.length + 1,
+      id: this.props.tarefas.length + 1,
       description: value,
       status: 'To Do'
     }
-    tasks = tasks.concat(newTask);
-    this.updateLocalStorage(tasks);
-    this.setState({ tasks });
+    this.props.dispatch(addTodo(newTask));
+    // tasks = tasks.concat(newTask);
+    // this.updateLocalStorage(tasks);
+    // this.setState({ tasks });
   }
 
   updateTask = (target, task) => {
-    let { tasks } = this.state;
-    tasks = tasks.filter(t => t.id !== task.id).concat({
-      ...task,
-      status: target.checked ? 'Done': 'To Do'
-    })
-    this.updateLocalStorage(tasks);
-    this.setState({ tasks });
+    this.props.dispatch(updateTask(target, task));
   }
   
   render() {
@@ -60,7 +52,7 @@ class App extends Component {
               key={column.title}
               columnTitle={column.title}
               addTask={this.addTask}
-              tasks={this.state.tasks}
+              tasks={this.props.tarefas}
               updateTask={this.updateTask}
             />
           ))}
@@ -70,4 +62,8 @@ class App extends Component {
   }
 }
 
-export default App;
+const mapStateToProps = state => ({
+  tarefas: state.todos
+})
+
+export default connect(mapStateToProps)(App);
